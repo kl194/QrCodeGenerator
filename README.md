@@ -38,10 +38,11 @@ The executable will appear in the `build` directory.
 
 ## Deployment (Windows)
 
-To deploy a standalone `.exe`, use:
+To deploy a standalone `.exe`, use: windeployqt
 
+For example:
 ```bash
-windeployqt path/to/your.exe
+windeploy "path-to-exe"
 ```
 
 This will copy all required Qt libraries into the executable folder.
