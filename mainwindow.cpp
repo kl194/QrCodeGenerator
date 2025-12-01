@@ -32,10 +32,11 @@ void MainWindow::on_btnGenerate_clicked()
     int imageSize = qrSize * scale;
 
     QImage image(imageSize, imageSize, QImage::Format_RGB32);
-    image.fill(Qt::white);
+    image.fill(bgColor);
+
 
     QPainter painter(&image);
-    painter.setBrush(Qt::black);
+    painter.setBrush(fgColor);
     painter.setPen(Qt::NoPen);
 
     for (int i = 0; i < qrSize; i++)
@@ -81,3 +82,22 @@ void MainWindow::on_btnCopy_clicked()
     clipboard->setPixmap(ui->qrLabel->pixmap());
 }
 
+
+void MainWindow::on_btnFgColor_clicked()
+{
+    QColor color = QColorDialog::getColor(fgColor, this, "Select QR Color");
+    if (color.isValid())
+    {
+        fgColor = color;
+    }
+}
+
+
+void MainWindow::on_btnBgColor_clicked()
+{
+    QColor color = QColorDialog::getColor(bgColor, this, "Select Background color");
+    if (color.isValid())
+    {
+        bgColor = color;
+    }
+}

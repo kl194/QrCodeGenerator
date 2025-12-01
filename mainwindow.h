@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QFileDialog>
 #include <QClipboard>
+#include <QColorDialog>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -27,7 +28,14 @@ private slots:
 
     void on_btnCopy_clicked();
 
+    void on_btnFgColor_clicked();
+
+    void on_btnBgColor_clicked();
+
 private:
     Ui::MainWindow *ui;
+
+    QColor fgColor = Qt::black;
+    QColor bgColor = Qt::white;
 };
 #endif // MAINWINDOW_H
