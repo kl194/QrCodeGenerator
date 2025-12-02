@@ -45,10 +45,20 @@ void MainWindow::on_btnGenerate_clicked()
         {
             if (qr.getModule(j, i))
             {
-                painter.drawRect(j * scale, i * scale, scale, scale);
+                QRectF r(j * scale, i * scale, scale, scale);
+
+                if (rounded == 1)
+                {
+                    painter.drawEllipse(r);
+                }
+                else
+                {
+                    painter.drawRect(r);
+                }
             }
         }
     }
+
 
     ui->qrLabel->setPixmap(
         QPixmap::fromImage(image).scaled(
@@ -101,3 +111,16 @@ void MainWindow::on_btnBgColor_clicked()
         bgColor = color;
     }
 }
+
+void MainWindow::on_cbRounded_checkStateChanged(const Qt::CheckState &arg1)
+{
+    if (rounded == 1)
+    {
+        rounded = 0;
+    }
+    else
+    {
+        rounded = 1;
+    }
+}
+

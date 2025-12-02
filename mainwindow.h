@@ -32,10 +32,14 @@ private slots:
 
     void on_btnBgColor_clicked();
 
+    void on_cbRounded_checkStateChanged(const Qt::CheckState &arg1);
+
 private:
     Ui::MainWindow *ui;
 
     QColor fgColor = Qt::black;
     QColor bgColor = Qt::white;
+
+    bool rounded = false;
 };
 #endif // MAINWINDOW_H
