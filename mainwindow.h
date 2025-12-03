@@ -6,12 +6,22 @@
 #include <QFileDialog>
 #include <QClipboard>
 #include <QColorDialog>
+#include <QPainterPath>
+#include <QQueue>
 
 QT_BEGIN_NAMESPACE
-namespace Ui {
-class MainWindow;
+namespace Ui
+{
+    class MainWindow;
 }
 QT_END_NAMESPACE
+
+enum class QrStyle
+{
+    Squares,
+    Rounded,
+    SoftRounded
+};
 
 class MainWindow : public QMainWindow
 {
@@ -32,7 +42,9 @@ private slots:
 
     void on_btnBgColor_clicked();
 
-    void on_cbRounded_checkStateChanged(const Qt::CheckState &arg1);
+    QrStyle getSelectedStyle() const;
+
+    void fillComboStyle();
 
 private:
     Ui::MainWindow *ui;
@@ -42,4 +54,5 @@ private:
 
     bool rounded = false;
 };
+
 #endif // MAINWINDOW_H

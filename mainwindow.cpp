@@ -4,11 +4,10 @@
 
 using namespace qrcodegen;
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    fillComboStyle();
 }
 
 MainWindow::~MainWindow()
@@ -16,10 +15,24 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::fillComboStyle()
+{
+    ui->cbStyle->clear();
+    ui->cbStyle->addItem("Squares", QVariant::fromValue((int)QrStyle::Squares));
+    ui->cbStyle->addItem("Rounded", QVariant::fromValue((int)QrStyle::Rounded));
+    ui->cbStyle->addItem("Soft Rounded", QVariant::fromValue((int)QrStyle::SoftRounded));
+}
+
+QrStyle MainWindow::getSelectedStyle() const
+{
+    QrStyle style = (QrStyle) ui->cbStyle->currentData().toInt();
+
+    return style;
+}
+
 void MainWindow::on_btnGenerate_clicked()
 {
     QString text = ui->inputText->text();
-
     if (text.isEmpty())
     {
         return;
@@ -27,46 +40,88 @@ void MainWindow::on_btnGenerate_clicked()
 
     QrCode qr = QrCode::encodeText(text.toUtf8().data(), QrCode::Ecc::MEDIUM);
 
-    int scale = 6;
+    int scale = 8;
     int qrSize = qr.getSize();
     int imageSize = qrSize * scale;
 
-    QImage image(imageSize, imageSize, QImage::Format_RGB32);
+    QImage image(imageSize, imageSize, QImage::Format_ARGB32);
     image.fill(bgColor);
 
-
     QPainter painter(&image);
+    painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setBrush(fgColor);
     painter.setPen(Qt::NoPen);
 
-    for (int i = 0; i < qrSize; i++)
-    {
-        for (int j = 0; j < qrSize; j++)
-        {
-            if (qr.getModule(j, i))
-            {
-                QRectF r(j * scale, i * scale, scale, scale);
+    QrStyle style = getSelectedStyle();
 
-                if (rounded == 1)
+    for (int y = 0; y < qrSize; y++)
+    {
+        for (int x = 0; x < qrSize; x++)
+        {
+            if (!qr.getModule(x, y))
+            {
+                continue;
+            }
+
+            QRect rect(x * scale, y * scale, scale, scale);
+            rect.adjust(0, 0, 1, 1);
+
+
+            switch (style)
+            {
+                case QrStyle::Squares:
                 {
-                    painter.drawEllipse(r);
+                    painter.drawRect(rect);
+                    break;
                 }
-                else
+
+                case QrStyle::Rounded:
                 {
-                    painter.drawRect(r);
+                    painter.drawEllipse(rect);
+                    break;
+                }
+                case QrStyle::SoftRounded:
+                {
+                    bool top    = (y > 0 && qr.getModule(x, y - 1));
+                    bool bottom = (y < qrSize - 1 && qr.getModule(x, y + 1));
+                    bool left   = (x > 0 && qr.getModule(x - 1, y));
+                    bool right  = (x < qrSize - 1 && qr.getModule(x + 1, y));
+
+                    bool tl = !top && !left;
+                    bool tr = !top && !right;
+                    bool bl = !bottom && !left;
+                    bool br = !bottom && !right;
+
+                    int r = scale * 0.5;
+
+                    QPainterPath path;
+                    path.moveTo(rect.left() + (tl ? r : 0), rect.top());
+
+                    path.lineTo(rect.right() - (tr ? r : 0), rect.top());
+                    if (tr) path.quadTo(rect.right(), rect.top(), rect.right(), rect.top() + r);
+
+                    path.lineTo(rect.right(), rect.bottom() - (br ? r : 0));
+                    if (br) path.quadTo(rect.right(), rect.bottom(), rect.right() - r, rect.bottom());
+
+                    path.lineTo(rect.left() + (bl ? r : 0), rect.bottom());
+                    if (bl) path.quadTo(rect.left(), rect.bottom(), rect.left(), rect.bottom() - r);
+
+                    path.lineTo(rect.left(), rect.top() + (tl ? r : 0));
+                    if (tl) path.quadTo(rect.left(), rect.top(), rect.left() + r, rect.top());
+
+                    painter.drawPath(path);
+                    break;
+
                 }
             }
         }
     }
 
-
-    ui->qrLabel->setPixmap(
-        QPixmap::fromImage(image).scaled(
-            ui->qrLabel->size(),
-            Qt::KeepAspectRatio,
-            Qt::SmoothTransformation
-            )
-        );
+    ui->qrLabel->setPixmap(QPixmap::fromImage(image).scaled(
+        ui->qrLabel->size(),
+        Qt::KeepAspectRatio,
+        Qt::SmoothTransformation
+        ));
 }
 
 void MainWindow::on_btnSave_clicked()
@@ -111,16 +166,3 @@ void MainWindow::on_btnBgColor_clicked()
         bgColor = color;
     }
 }
-
-void MainWindow::on_cbRounded_checkStateChanged(const Qt::CheckState &arg1)
-{
-    if (rounded == 1)
-    {
-        rounded = 0;
-    }
-    else
-    {
-        rounded = 1;
-    }
-}
-

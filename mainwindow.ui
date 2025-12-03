@@ -191,9 +191,9 @@
       </widget>
      </item>
      <item row="4" column="2">
-      <widget class="QCheckBox" name="cbRounded">
-       <property name="text">
-        <string>Rounded QR code</string>
+      <widget class="QComboBox" name="cbStyle">
+       <property name="editable">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
