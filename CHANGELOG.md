@@ -1,4 +1,11 @@
 # Changelog
+## [3.0] - 2025-12-06
+### Added
+- Settings persistence (JSON):
+  The app now automatically saves and loads:
+  - QR foreground color;
+  - Background color;
+  - Selected QR style.
 
 ## [2.2] - 2025-12-03
 ### Added
