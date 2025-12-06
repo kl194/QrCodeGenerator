@@ -8,6 +8,9 @@
 #include <QColorDialog>
 #include <QPainterPath>
 #include <QQueue>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QFile>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -45,6 +48,10 @@ private slots:
     QrStyle getSelectedStyle() const;
 
     void fillComboStyle();
+
+    void saveSettings();
+
+    void loadSettings();
 
 private:
     Ui::MainWindow *ui;

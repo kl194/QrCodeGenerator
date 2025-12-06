@@ -8,12 +8,59 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 {
     ui->setupUi(this);
     fillComboStyle();
+    loadSettings();
 }
 
 MainWindow::~MainWindow()
 {
+    saveSettings();
     delete ui;
 }
+
+void MainWindow::saveSettings()
+{
+    QJsonObject json;
+
+    json["fgColor"] = fgColor.name(QColor::HexArgb);
+    json["bgColor"] = bgColor.name(QColor::HexArgb);
+    json["typeIndex"] = ui->cbStyle->currentIndex();
+
+    QJsonDocument doc(json);
+
+    QFile file("settings.json");
+    if (file.open(QIODevice::WriteOnly))
+    {
+        file.write(doc.toJson());
+        file.close();
+    }
+}
+
+void MainWindow::loadSettings()
+{
+    QFile file("settings.json");
+    if (!file.exists())
+    {
+        return;
+    }
+
+    if (file.open(QIODevice::ReadOnly))
+    {
+        QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+        file.close();
+
+        QJsonObject json = doc.object();
+
+        fgColor = QColor(json["fgColor"].toString());
+        bgColor = QColor(json["bgColor"].toString());
+
+        int idx = json["typeIndex"].toInt();
+        if (idx >= 0 && idx < ui->cbStyle->count())
+        {
+            ui->cbStyle->setCurrentIndex(idx);
+        }
+    }
+}
+
 
 void MainWindow::fillComboStyle()
 {
